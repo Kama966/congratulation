@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Happy International Women's Day 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Jost:wght@200;300;400&display=swap" rel="stylesheet"/>
+<style>
+/* ── reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --rose:       #f2a0b8;
+  --deep-rose:  #d4607a;
+  --blush:      #fce8f0;
+  --lavender:   #e2d0f8;
+  --violet:     #a87dd4;
+  --white:      #fffbfd;
+  --text:       #4a2d3c;
+  --muted:      #9a6e82;
+  --card-bg:    rgba(255,255,255,0.62);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  background: var(--white);
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── layered background ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -3;
+  background:
+    radial-gradient(ellipse 90% 70% at 10%  15%, #fde0ea 0%, transparent 55%),
+    radial-gradient(ellipse 80% 80% at 92%  88%, #ead5fb 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 55%  45%, #fff0f5 0%, transparent 65%),
+    radial-gradient(ellipse 50% 40% at 80%  10%, #fde8f5 0%, transparent 50%);
+  background-color: #fff8fb;
+}
+
+/* ── confetti canvas ── */
+#confetti-canvas {
+  position: fixed; inset: 0; z-index: 200;
+  pointer-events: none;
+}
+
+/* ── floating petal canvas ── */
+#petal-canvas {
+  position: fixed; inset: 0; z-index: -1;
+  pointer-events: none;
+}
+
+/* ════════════════════════════
+   PAGE LAYOUT
+════════════════════════════ */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px 80px;
+  gap: 48px;
+}
+
+/* ── top ribbon ── */
+.ribbon {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.2s ease forwards;
+}
+.ribbon-line {
+  width: 48px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rose));
+}
+.ribbon-line.r { background: linear-gradient(90deg, var(--rose), transparent); }
+.ribbon-text {
+  font-size: 0.68rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 400;
+}
+
+/* ── hero section ── */
+.hero {
+  text-align: center;
+  max-width: 680px;
+  opacity: 0;
+  animation: fadeUp 1s 0.5s ease forwards;
+}
+
+.hero-symbol {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 20px;
+  animation: floatY 3.5s ease-in-out infinite;
+}
+@keyframes floatY {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+h1 em {
+  font-style: italic;
+  color: var(--deep-rose);
+}
+h1 span.accent {
+  background: linear-gradient(135deg, var(--deep-rose), var(--violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--muted);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* ── divider ── */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.85s ease forwards;
+}
+.divider-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(242,160,184,0.5), transparent);
+}
+.divider-icon { color: var(--rose); font-size: 1.1rem; }
+
+/* ── qualities grid ── */
+.qualities-section {
+  opacity: 0;
+  animation: fadeUp 1s 1.05s ease forwards;
+  width: 100%; max-width: 620px;
+}
+.qualities-label {
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--violet);
+  margin-bottom: 22px;
+  font-weight: 400;
+}
+.qualities-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+@media (max-width: 500px) {
+  .qualities-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.quality-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 20px;
+  padding: 22px 12px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(168,125,212,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: default;
+}
+.quality-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(168,125,212,0.18);
+}
+.quality-icon { font-size: 1.5rem; display: block; margin-bottom: 10px; }
+.quality-word {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text);
+  display: block;
+  margin-bottom: 4px;
+}
+.quality-desc {
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+/* ── button ── */
+.btn-wrap {
+  opacity: 0;
+  animation: fadeUp 0.9s 1.3s ease forwards;
+  text-align: center;
+}
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 44px;
+  border: none;
+  border-radius: 60px;
+  background: linear-gradient(135deg, #f2a0b8 0%, #c47dd4 100%);
+  color: white;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.92rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(196,125,212,0.38);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 36px rgba(196,125,212,0.48); }
+.btn:active { transform: scale(0.97); }
+.btn-shimmer {
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
+  animation: shimmer 2.8s linear infinite;
+}
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* ── surprise message ── */
+.surprise-msg {
+  max-width: 480px; width: 100%;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.88) translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.34,1.56,0.64,1), transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+}
+.surprise-msg.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+.surprise-inner {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(242,160,184,0.35);
+  border-radius: 28px;
+  padding: 36px 32px;
+  box-shadow: 0 8px 40px rgba(212,96,122,0.12), inset 0 1px 0 rgba(255,255,255,0.95);
+}
+.surprise-emoji { font-size: 2.2rem; display: block; margin-bottom: 14px; }
+.surprise-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1.3rem, 3.5vw, 1.7rem);
+  line-height: 1.45;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.surprise-text strong { color: var(--deep-rose); font-style: normal; }
+.surprise-small {
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* ── dedication ── */
+.dedication {
+  opacity: 0;
+  animation: fadeUp 0.9s 1.55s ease forwards;
+  max-width: 480px; width: 100%;
+  text-align: center;
+}
+.dedication-inner {
+  background: linear-gradient(135deg, rgba(252,232,240,0.7), rgba(226,208,248,0.6));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(242,160,184,0.35);
+  border-radius: 24px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 24px rgba(212,96,122,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.dedication-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--violet);
+  font-weight: 400;
+  display: block;
+  margin-bottom: 12px;
+}
+.dedication-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+.dedication-text strong {
+  font-style: normal;
+  color: var(--deep-rose);
+}
+
+/* ── footer ── */
+.footer {
+  opacity: 0;
+  animation: fadeUp 0.8s 1.7s ease forwards;
+  font-size: 0.73rem;
+  color: rgba(154,110,130,0.45);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+/* ── keyframes ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── burst particles ── */
+.burst {
+  position: fixed;
+  font-size: 1.3rem;
+  pointer-events: none;
+  z-index: 300;
+  animation: burstFly var(--dur) ease forwards;
+}
+@keyframes burstFly {
+  0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--tx),var(--ty)) scale(0.4) rotate(var(--rot)); }
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<canvas id="petal-canvas"></canvas>
+
+<main class="page">
+
+  <!-- ribbon -->
+  <div class="ribbon">
+    <div class="ribbon-line"></div>
+    <span class="ribbon-text">✦ International Women's Day ✦</span>
+    <div class="ribbon-line r"></div>
+  </div>
+
+  <!-- hero -->
+  <section class="hero">
+    <span class="hero-symbol">🌸</span>
+    <h1>Happy <em>International</em><br><span class="accent">Women's Day</span><br><em>to the girls of the 9th chat!</em></h1>
+    <p class="hero-sub">
+      To every girl and woman — you are a force of nature.
+      Your strength moves mountains, your kindness heals hearts,
+      and your light makes the whole world more beautiful. 💕
+    </p>
+  </section>
+
+  <!-- divider -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <span class="divider-icon">✿</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- qualities -->
+  <div class="qualities-section">
+    <p class="qualities-label">You are…</p>
+    <div class="qualities-grid">
+      <div class="quality-card">
+        <span class="quality-icon">💪</span>
+        <span class="quality-word">Strong</span>
+        <span class="quality-desc">in every storm</span>
+      </div>
+      <div class="quality-card">
+        <span class="quality-icon">🤍</span>
+        <span class="quality-word">Kind</span>
+        <span class="quality-desc">beyond measure</span>
+      </div>
+      <div class="quality-card">
+        <span class="quality-icon">✨</span>
+        <span class="quality-word">Inspiring</span>
+        <span class="quality-desc">to all around</span>
+      </div>
+      <div class="quality-card">
+        <span class="quality-icon">🌺</span>
+        <span class="quality-word">Amazing</span>
+        <span class="quality-desc">just as you are</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- button -->
+  <div class="btn-wrap">
+    <button class="btn" id="surpriseBtn">
+      <span class="btn-shimmer"></span>
+      <span>🎀</span>
+      <span>Click for a Surprise</span>
+    </button>
+  </div>
+
+  <!-- surprise message -->
+  <div class="surprise-msg" id="surpriseMsg">
+    <div class="surprise-inner">
+      <span class="surprise-emoji">🌟</span>
+      <p class="surprise-text">
+        "You make the world brighter.<br>
+        <strong>Happy March 8!</strong>"
+      </p>
+      <p class="surprise-small">with love &amp; admiration 💗</p>
+    </div>
+  </div>
+
+  <!-- dedication -->
+  <div class="dedication">
+    <div class="dedication-inner">
+      <span class="dedication-label">💌 a special note</span>
+      <p class="dedication-text">
+        Happy International Women's Day to the<br>
+        <strong>girls of the 9th chat!</strong><br>
+        May you feel celebrated, appreciated,<br>
+        and loved — today and every day. 🌸💕
+      </p>
+    </div>
+  </div>
+
+  <p class="footer">March 8 · Celebrating women everywhere 🌍</p>
+
+</main>
+
+<script>
+/* ════════════════════════════════════════
+   1. FLOATING PETALS
+════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('petal-canvas');
+  const ctx    = canvas.getContext('2d');
+  const EMOJIS = ['🌸','🌷','💕','✿','💗','🌺','🌼'];
+  let W, H, pts = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function Petal() {
+    this.init = (fromTop) => {
+      this.x     = Math.random() * W;
+      this.y     = fromTop ? -28 : Math.random() * H;
+      this.size  = 13 + Math.random() * 13;
+      this.sym   = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+      this.vx    = (Math.random() - 0.5) * 0.7;
+      this.vy    = 0.28 + Math.random() * 0.52;
+      this.alpha = 0.18 + Math.random() * 0.38;
+      this.angle = Math.random() * Math.PI * 2;
+      this.va    = (Math.random() - 0.5) * 0.018;
+    };
+    this.init(false);
+    this.tick = () => {
+      this.x += this.vx; this.y += this.vy; this.angle += this.va;
+      if (this.y > H + 30) this.init(true);
+    };
+    this.draw = () => {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.font        = this.size + 'px serif';
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.fillText(this.sym, -this.size / 2, this.size / 2);
+      ctx.restore();
+    };
+  }
+
+  for (let i = 0; i < 30; i++) pts.push(new Petal());
+
+  (function loop() {
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach(p => { p.tick(); p.draw(); });
+    requestAnimationFrame(loop);
+  })();
+})();
+
+
+/* ════════════════════════════════════════
+   2. ENTRY CONFETTI
+════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H;
+  const COLORS = ['#f2a0b8','#c47dd4','#a87dd4','#fbc2d3','#e2d0f8','#f9d1e2','#d4607a'];
+  let pieces   = [];
+  let active   = true;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function Piece() {
+    this.x    = Math.random() * W;
+    this.y    = -10 - Math.random() * 120;
+    this.w    = 6 + Math.random() * 8;
+    this.h    = 3 + Math.random() * 5;
+    this.color= COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.vx   = (Math.random() - 0.5) * 3.5;
+    this.vy   = 2.5 + Math.random() * 3.5;
+    this.angle= Math.random() * 360;
+    this.va   = (Math.random() - 0.5) * 5;
+    this.alpha= 1;
+    this.draw = () => {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle   = this.color;
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle * Math.PI / 180);
+      ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
+      ctx.restore();
+    };
+    this.update = () => {
+      this.x     += this.vx;
+      this.y     += this.vy;
+      this.angle += this.va;
+      if (this.y > H * 0.75) this.alpha -= 0.02;
+    };
+  }
+
+  for (let i = 0; i < 160; i++) pieces.push(new Piece());
+
+  (function loop() {
+    ctx.clearRect(0, 0, W, H);
+    if (!active) { canvas.style.display = 'none'; return; }
+    pieces = pieces.filter(p => p.alpha > 0);
+    pieces.forEach(p => { p.update(); p.draw(); });
+    if (pieces.length === 0) active = false;
+    requestAnimationFrame(loop);
+  })();
+})();
+
+
+/* ════════════════════════════════════════
+   3. SURPRISE BUTTON
+════════════════════════════════════════ */
+(function() {
+  const btn = document.getElementById('surpriseBtn');
+  const msg = document.getElementById('surpriseMsg');
+  let shown = false;
+
+  function spawnBursts(e) {
+    const cx = e ? e.clientX : window.innerWidth / 2;
+    const cy = e ? e.clientY : window.innerHeight / 2;
+    const ITEMS = ['💕','🌸','✨','💗','🌷','🎀','💖','🌺'];
+    const N = 18;
+    for (let i = 0; i < N; i++) {
+      const el  = document.createElement('span');
+      el.className = 'burst';
+      const angle = (i / N) * Math.PI * 2;
+      const dist  = 70 + Math.random() * 100;
+      el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+      el.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+      el.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+      el.style.setProperty('--dur', (0.7 + Math.random() * 0.5) + 's');
+      el.style.left = cx + 'px';
+      el.style.top  = cy + 'px';
+      el.style.animationDelay = (Math.random() * 0.12) + 's';
+      el.textContent = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1400);
+    }
+  }
+
+  btn.addEventListener('click', function(e) {
+    spawnBursts(e);
+    if (!shown) {
+      shown = true;
+      msg.classList.add('visible');
+      btn.textContent = '';
+      btn.innerHTML   = '<span class="btn-shimmer"></span><span>💖</span><span>Celebrate Again!</span>';
+    } else {
+      // second click: mini burst only
+    }
+  });
+})();
+</script>
+</body>
+</html>
